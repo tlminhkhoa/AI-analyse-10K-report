@@ -92,17 +92,16 @@ On average, a report with 60,0146 words can be reduced down to 6,175, which is a
 
 The final output layer of BERTSUMEXT is a classifier which helps the model obtain the importance score for each sentence. The model ranks these sentences by their scores and selects the top-3 sentences as the summary. BERTSUMEXT achieved state-of-the-art performance on various datasets, but no study has applied it to annual reports.
 
-<p style="display: flex; float: left; ">
+<p style="text-align: center">
     <img 
     width="400"
     height="300"
     src="https://securecdn.pymnts.com/wp-content/uploads/2015/07/transparency-e1438278362553.jpg", style ="padding-right : 13px">
    
-<div style ="padding-bottom: 15px" =>
-      The reason I want to choose BERTSUMEXT over others methods is that BERTSUMEXT is able to produce important sentences from a given paragraph. I view this as a form of transparent feature extraction, which can remove unnecessary information and still be able to present human-level information. Transparency in finance is extremely important due to the million dollars behind every decision. Moreover, it also helps diagnose the system when needed.</div>
 </p>
 
 
+The reason I want to choose BERTSUMEXT over others methods is that BERTSUMEXT is able to produce important sentences from a given paragraph. I view this as a form of transparent feature extraction, which can remove unnecessary information and still be able to present human-level information. Transparency in finance is extremely important due to the million dollars behind every decision. Moreover, it also helps diagnose the system when needed.
 
 
 ---
@@ -178,5 +177,125 @@ For positive sentiments, words like “increase”, “new”, and “growth” 
 Whereas the word indicates uncertainty like “may”,  or negative meaning like “adversely”, or “risk” occur more frequently in negative sentiment. Moreover, common words “market”, “oper”- root for operation, and “rate” indicate that our model successfully captures the context of the sentences not guessing based on words only.
 
 
+<p style="text-align: center">
+    <img
+    width=""
+    height="300"
+    src="https://i.imgur.com/Yho2DeB.png">
+    <div style="text-align: center"> Netral sentiment word cloud </div>
 
-###### tags: `Templates` `Documentation`
+</p>
+
+
+I randomly chose some paragraphs to investigate the model performance. The following are some examples.
+
+![](https://i.imgur.com/lkP26jy.png)
+
+The above sentence gets a classifying score of Neutral: -2.0949, Positive: -2.3267,  Negative: 6.3221
+As the text mentions the company's limits in new markets and difficulties, the model correctly classifies it as negative.
+
+
+As I mentioned before, 60% of sentiment is neutral. Below is an example of neutral sentiment.
+
+![](https://i.imgur.com/arJqxBO.png)
+
+
+This summarization is correctly selected as neutral since the sentences mention only the marketing channel without any implication of good or bad. 
+
+Stock direction prediction :money_with_wings:
+===
+
+Normally due to the high noise-to-signal ratio of stock prices, it is not recommended to predict stock prices directly. The more sensitive approach is using quantitative analysis which neutralizes the market and measures the returns of the alpha factor for a portfolio in a stock universe.
+
+:::info 
+However, I am personally curious about how a tree-based model can give insight into what section is the most important in a given report. This can give an investor knowledge of important sections that affect the stock return and should be paid attention to. 
+:::
+
+Data set 
+---
+
+I also collected a 2-month stock return before and after the 10K announcement, usually from the beginning of December to the end of January next year. However, the company can delay its report, in that case, the months are adjusted. This is done by the Yahoo Finance API.
+
+![](https://miro.medium.com/max/1400/1*PyZ91jfRlllJrCG7X4cCIA.jpeg)
+
+The range is selected to remove speculation from the market. This is a common phenomenon where the market tries to guess the report’s content and influences price irrationally. Moreover, I also want to avoid the panic from the market that leads to overselling or overbuying after the report announces, choosing one month after to help the stock price return to rational. Therefore the 2 months range is chosen as a buffer for these 2 phenomena.
+
+
+
+I decide to predict the stock price direction rather than the stock price itself due to the high noise-to-signal ratio of the stock price. It is common knowledge that stock price returns are distributed normally with fat tails, this means more extreme events are likely to occur. 
+
+
+<p style="text-align: center">
+    <img
+    width=""
+    height="300"
+    src="https://i.imgur.com/88Eco1G.png">
+    <div style="text-align: center">  2 months stock return collected </div> </p>
+
+The above is my 2 months stock return from the stock universe, we can observe that although most of the value centers around 0, many extreme cases with loss or gain up to 300 still happen.I believe that we do not have enough data to cover all the extreme cases in regression. By converting to a classification problem, the model will cover these cases' directions correctly without specifying the value. Moreover, predicting the direction alone can bring large benefits to investors.  
+
+This done by take the difference between the latter month to the earlier month to get the direction of the stock. Going down is 0, and Going up is 1.
+
+
+<p style="text-align: center">
+    <img
+    width=""
+    height="300"
+    src="https://i.imgur.com/YYDdQKG.png">
+    <div style="text-align: center"> Class distribution after transformation </div></p>
+
+
+It can be observed that when stock returns are mapped into stock return direction, the label increase occurs more than decrease. This reflects the market trend of going up on average. 
+
+
+Modeling (Random Forest)
+---
+
+To predict the stock direction, I employed a random forest model for the task.  The reason is the model's ability to deal with noise by bootstrapping  However, the risk of overfitting is still present due to the nature of the data.
+
+Therefore 10 fold cross-validation is also used to gain model insight. I decided to choose 10-fold cross-validation over the train-test split method because of the lack of training data. 
+
+
+To account for the imbalance of labels, where the label increase is more than the decrease, using the sklearn class_weight parameter, I put more weight on the decrease class, specifically 1.5 to 1. Another hyperparameter is tuned using grid search, which gives the following set:
+* random_state=0
+* max_depth =10
+* n_estimators= 30
+
+
+<p style="text-align: center">
+    <img
+    width=""
+    height="300"
+    src="https://i.imgur.com/QgOK8SM.png">
+</p>
+
+Due to the high noise-to-signal ratio, I achieve around 63% of accuracy, some can view this as low compared to other problems, however, stock direction prediction is reasonable. Much of the research I found, took [“Predicting Stock Price Direction using Support Vector Machines “](https://https://www.cs.princeton.edu/sites/default/files/uploads/saahil_madge.pdf) for example, only achieve 55% to 60% on test prediction. Therefore, the result can be viewed as acceptable. Our standard deviation is around 4%, indicating that the expected will not deviate far from the mean.
+
+<p style="text-align: center">
+    <img
+    width=""
+    height="500"
+    src="https://i.imgur.com/DSJxvqT.png">
+</p>
+
+The feature name is mapped into numbers, the notion as follows:
+* From 0 to 3 is the sentiment from section 1
+* From 4 to 7 is the sentiment from section 1A
+* From 8 to 11 is the sentiment from section 3
+* From 12 to 15 is the sentiment from section 7
+* From 16 to 19 is the sentiment from section 7A
+* From 20 to 23 is the sentiment from section 8
+
+According to our model, on average, sentiment from section 7 “Management’s Discussion and Analysis of  Financial Condition and Results of Operations” is the most important section to indicate a stock direction, followed by section 1 “Business”. Section 8 “Financial Statements and Supplementary Data” is the least informative. This suggests that investors should pay more attention to these sections than others.
+
+
+Limitations and possible extensions
+===
+
+1. I still face some limitations related to raw data format. Most of the 10K I collected is unusable due to HTML structure. Given a cleaner set, more data can be extracted. 
+2. The models I used are trained on news data which can be different from the data used in financial reports. Therefore the second limitation is a purely manual task because there are no summaries for annual reports available. Similarly, for sentiment, it requires generating labeled data. Alternatively, unsupervised summarization models could be examined.
+3.  BERTSUMEXT sometimes leans toward choosing the first sentence of a given paragraph. The reason is because of what it was trained on (news-related data).
+4.  Finally, the stock direction is measured only by the difference in price from 2 months. In a more quantitative analysis environment, this should be done by taking into account the market trend, removing risk factors, and measuring the alpha effect.
+
+
+###### tags: `10K report` `Documentation` `machine learning` `Stock`
