@@ -11,7 +11,19 @@ AI analyse 10K :book:
 
 ## Table of Contents
 
-[TOC]
+- [AI analyse 10K :book:](#ai-analyse-10k)
+  * [Table of Contents](#table-of-contents)
+  * [Backstory :film_projector:](#backstory--film-projector-)
+  * [Pipeline](#pipeline)
+  * [Dataset](#dataset)
+  * [Data Preprocessing](#data-preprocessing)
+  * [Summarization (BERTSUMTEXT and Results)](#summarization--bertsumtext-and-results-)
+  * [Sentiment Analysis (Finbert and Results)](#sentiment-analysis--finbert-and-results-)
+- [Stock direction prediction :money_with_wings:](#stock-direction-prediction--money-with-wings-)
+  * [Data set](#data-set)
+  * [Modeling (Random Forest)](#modeling--random-forest)
+- [Limitations and possible extensions](#limitations-and-possible-extensions)
+
 
 ## Backstory :film_projector: 
 
@@ -38,9 +50,9 @@ To achieve this, I built a tool to mine 10K reports from the S&P500 from 2016 to
 The reason I choose the year range from 2016 to 2018 is to avoid the effect of Covid-19 on the financial market.
 
 ![](https://i.imgur.com/FNlfV10.jpg)
-:::info 
+
 In total, I collected over 1400 financial reports, which total 70 GB of storage in the form of  HTML files. Please see the `Crawler.ipynb` for deatil code. 
-:::
+
 For anyone trying to replicate the project, I do not encourage downloading all the datasets again. Follow the google drive links below to have access to my dataset
 
 > Dataset: https://drive.google.com/drive/u/1/folders/17Txfj8Ceq_1MP016MwSmP6fhtN-zEnO_ 
@@ -74,11 +86,11 @@ Summarization (BERTSUMTEXT and Results)
 
 BERTSUMEXT was pre-trained on CNN and DailyMail datasets, which contain news articles and associated highlights. 
 
-:::info 
-On average, a report with 60,0146 words can be reduced down to 6,175, which is around 10% of the length.
-:::
 
-<p style="text-align: center">
+On average, a report with 60,0146 words can be reduced down to 6,175, which is around 10% of the length.
+
+
+<p align="center">
     <img
     width=""
     height="300"
@@ -86,13 +98,13 @@ On average, a report with 60,0146 words can be reduced down to 6,175, which is a
         <img 
     width="300"
     height="300"
-    src="https://storage.googleapis.com/kaggle-datasets-images/1654566/2715323/44ef1513e9d7d4f78cbe1aeee8c1a866/dataset-card.jpg?t=2021-10-17-19-36-14?t=2021-10-18-05-20-13">
+    src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQ7NUH8gBQPcNuw2B8svHChlSaW38mXa83Jo4_AkibUbPVkS-fw">
 
 </p>
 
 The final output layer of BERTSUMEXT is a classifier which helps the model obtain the importance score for each sentence. The model ranks these sentences by their scores and selects the top-3 sentences as the summary. BERTSUMEXT achieved state-of-the-art performance on various datasets, but no study has applied it to annual reports.
 
-<p style="text-align: center">
+<p align="center">
     <img 
     width="400"
     height="300"
@@ -136,13 +148,13 @@ FINBERT is a BERT model pre-trained on financial communication text. It is train
 
 ![image alt](https://content.presspage.com/uploads/2658/1920_headerimagetech7.png?10000)
 
-:::info 
+
 In total, Finbert classifies 13.027 sentences as neutral, 1.289 sentences as positive, and 2.724 sentences as negative.  It is reasonable that most of the sentences are neutral since as the nature of the 10K, most of the material is reporting. 
-:::
+
 
 However, the number of negative sentiments is double the number of positive ones. Interestingly, this is because the SEC required every company to have section 1A, “Risk Factor”, therefore, it introduces a dense negative section in each report.
 
-<p style="text-align: center">
+<p align="center">
     <img
     width=""
     height="300"
@@ -152,7 +164,7 @@ However, the number of negative sentiments is double the number of positive ones
 This fact can be observed when we break down the sentiment distribution. Most of the negative sentiment is section 1A, risk factor. The positive ones are distributed evenly and mostly around sections 1 and 7, which are “Business” and “Management’s Discussion and Analysis of  Financial Condition and Results of Operations” respectively.
 
 
-<p style="text-align: center">
+<p align="center">
     <img
     width=""
     height="300"
@@ -164,7 +176,7 @@ This fact can be observed when we break down the sentiment distribution. Most of
 For positive sentiments, words like “increase”, “new”, and “growth” occur more frequently in positive sentiment. These words usually indicate advantageous information for the company.
 
 
-<p style="text-align: center">
+<p align="center">
     <img
     width=""
     height="300"
@@ -177,7 +189,7 @@ For positive sentiments, words like “increase”, “new”, and “growth” 
 Whereas the word indicates uncertainty like “may”,  or negative meaning like “adversely”, or “risk” occur more frequently in negative sentiment. Moreover, common words “market”, “oper”- root for operation, and “rate” indicate that our model successfully captures the context of the sentences not guessing based on words only.
 
 
-<p style="text-align: center">
+<p align="center">
     <img
     width=""
     height="300"
@@ -207,9 +219,9 @@ Stock direction prediction :money_with_wings:
 
 Normally due to the high noise-to-signal ratio of stock prices, it is not recommended to predict stock prices directly. The more sensitive approach is using quantitative analysis which neutralizes the market and measures the returns of the alpha factor for a portfolio in a stock universe.
 
-:::info 
+ 
 However, I am personally curious about how a tree-based model can give insight into what section is the most important in a given report. This can give an investor knowledge of important sections that affect the stock return and should be paid attention to. 
-:::
+
 
 Data set 
 ---
@@ -225,7 +237,7 @@ The range is selected to remove speculation from the market. This is a common ph
 I decide to predict the stock price direction rather than the stock price itself due to the high noise-to-signal ratio of the stock price. It is common knowledge that stock price returns are distributed normally with fat tails, this means more extreme events are likely to occur. 
 
 
-<p style="text-align: center">
+<p align="center">
     <img
     width=""
     height="300"
@@ -237,7 +249,7 @@ The above is my 2 months stock return from the stock universe, we can observe th
 This done by take the difference between the latter month to the earlier month to get the direction of the stock. Going down is 0, and Going up is 1.
 
 
-<p style="text-align: center">
+<p align="center">
     <img
     width=""
     height="300"
@@ -262,7 +274,7 @@ To account for the imbalance of labels, where the label increase is more than th
 * n_estimators= 30
 
 
-<p style="text-align: center">
+<p align="center">
     <img
     width=""
     height="300"
@@ -271,7 +283,7 @@ To account for the imbalance of labels, where the label increase is more than th
 
 Due to the high noise-to-signal ratio, I achieve around 63% of accuracy, some can view this as low compared to other problems, however, stock direction prediction is reasonable. Much of the research I found, took [“Predicting Stock Price Direction using Support Vector Machines “](https://https://www.cs.princeton.edu/sites/default/files/uploads/saahil_madge.pdf) for example, only achieve 55% to 60% on test prediction. Therefore, the result can be viewed as acceptable. Our standard deviation is around 4%, indicating that the expected will not deviate far from the mean.
 
-<p style="text-align: center">
+<p align="center">
     <img
     width=""
     height="500"
