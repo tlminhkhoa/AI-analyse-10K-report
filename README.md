@@ -11,17 +11,17 @@ AI analyse 10K :book:
 
 ## Table of Contents
 
-- [AI analyse 10K :book:](#ai-analyse-10k)
+- [AI analyse 10K :book:](#ai-analyse-10k-book)
   * [Table of Contents](#table-of-contents)
-  * [Backstory :film_projector:](#backstory--film-projector-)
+  * [Backstory :film_projector:](#backstory-film_projector)
   * [Pipeline](#pipeline)
   * [Dataset](#dataset)
   * [Data Preprocessing](#data-preprocessing)
-  * [Summarization (BERTSUMTEXT and Results)](#summarization--bertsumtext-and-results-)
-  * [Sentiment Analysis (Finbert and Results)](#sentiment-analysis--finbert-and-results-)
-- [Stock direction prediction :money_with_wings:](#stock-direction-prediction--money-with-wings-)
+  * [Summarization (BERTSUMTEXT and Results)](#summarization-bertsumtext-and-results)
+  * [Sentiment Analysis (Finbert and Results)](#sentiment-analysis-finbert-and-results)
+- [Stock direction prediction :money_with_wings:](#stock-direction-prediction-money_with_wings)
   * [Data set](#data-set)
-  * [Modeling (Random Forest)](#modeling--random-forest)
+  * [Modeling (Random Forest)](#modeling-random-forest)
 - [Limitations and possible extensions](#limitations-and-possible-extensions)
 
 
